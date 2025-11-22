@@ -929,3 +929,469 @@
       document.getElementById('allowFileAttachments').checked = true;
       document.getElementById('eventTags').value = '';
       document.getElementById('eventDuration').value = '60';
+      document.getElementById('modalTitle').textContent = 'Create New Event';
+      document.getElementById('eventModal').classList.add('active');
+    }
+
+    function closeEventForm() {
+      document.getElementById('eventModal').classList.remove('active');
+    }
+
+    function saveEvent() {
+      const title = document.getElementById('eventTitle').value;
+      const date = document.getElementById('eventDate').value;
+      
+      if (!title || !date) {
+        alert('Please fill in title and date');
+        return;
+      }
+
+      const eventData = {
+        id: editingEventId || Date.now(),
+        title,
+        date,
+        time: document.getElementById('eventTime').value,
+        location: document.getElementById('eventLocation').value,
+        duration: parseInt(document.getElementById('eventDuration').value),
+        category: document.getElementById('eventCategory').value,
+        description: document.getElementById('eventDescription').value,
+        notes: document.getElementById('eventNotes').value,
+        reminder: document.getElementById('eventReminder').checked,
+        recurring: document.getElementById('eventRecurring').checked,
+        recurringPattern: document.getElementById('recurringPattern').value,
+        emailTemplate: document.getElementById('emailTemplate').value,
+        reminderHours: parseInt(document.getElementById('reminderHours').value),
+        smsEnabled: document.getElementById('smsEnabled').value === 'yes',
+        enableComments: document.getElementById('enableComments').checked,
+        shareWith: document.getElementById('shareEmails').value.split(',').map(e => e.trim()),
+        allowFiles: document.getElementById('allowFileAttachments').checked,
+        tags: document.getElementById('eventTags').value.split(',').map(t => t.trim()),
+        createdAt: new Date().toISOString()
+      };
+
+      if (editingEventId) {
+        const idx = events.findIndex(e => e.id === editingEventId);
+        events[idx] = eventData;
+      } else {
+        events.push(eventData);
+      }
+
+      saveData();
+      updateUI();
+      closeEventForm();
+    }
+
+    function deleteEvent(id) {
+      if (confirm('Delete this event?')) {
+        events = events.filter(e => e.id !== id);
+        saveData();
+        updateUI();
+      }
+    }
+
+    function editEvent(id) {
+      const event = events.find(e => e.id === id);
+      if (!event) return;
+
+      editingEventId = id;
+      document.getElementById('eventTitle').value = event.title;
+      document.getElementById('eventDate').value = event.date;
+      document.getElementById('eventTime').value = event.time;
+      document.getElementById('eventLocation').value = event.location;
+      document.getElementById('eventDuration').value = event.duration || 60;
+      document.getElementById('eventCategory').value = event.category;
+      document.getElementById('eventDescription').value = event.description;
+      document.getElementById('eventNotes').value = event.notes;
+      document.getElementById('eventReminder').checked = event.reminder;
+      document.getElementById('eventRecurring').checked = event.recurring;
+      document.getElementById('reminderHours').value = event.reminderHours || 24;
+      document.getElementById('smsEnabled').value = event.smsEnabled ? 'yes' : 'no';
+      document.getElementById('enableComments').checked = event.enableComments;
+      document.getElementById('shareEmails').value = event.shareWith ? event.shareWith.join(', ') : '';
+      document.getElementById('allowFileAttachments').checked = event.allowFiles;
+      document.getElementById('eventTags').value = event.tags ? event.tags.join(', ') : '';
+      document.getElementById('emailTemplate').value = event.emailTemplate;
+      document.getElementById('modalTitle').textContent = 'Edit Event';
+      document.getElementById('eventModal').classList.add('active');
+    }
+
+    // Calendar
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      document.getElementById('monthDisplay').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+      let html = '';
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
+        html += `<div class="calendar-header">${d}</div>`;
+      });
+
+      for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate);
+        startDate.setDate(startDate.getDate() + 1);
+        const dateStr = date.toISOString().split('T')[0];
+        const dayEvents = events.filter(e => e.date === dateStr);
+        const isCurrentMonth = date.getMonth() === month;
+
+        html += `<div class="calendar-day ${!isCurrentMonth ? 'other-month' : ''}">
+          <div class="calendar-day-date">${date.getDate()}</div>`;
+        
+        dayEvents.slice(0, 2).forEach(e => {
+          const className = `event-${e.category}`;
+          html += `<div class="event-item ${className}">${e.title}</div>`;
+        });
+        
+        if (dayEvents.length > 2) {
+          html += `<div style="font-size: 0.75rem; color: #4b5563;">+${dayEvents.length - 2} more</div>`;
+        }
+        
+        html += '</div>';
+      }
+
+      document.getElementById('calendar').innerHTML = html;
+    }
+
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
+
+    // List view
+    function renderList() {
+      const sorted = [...events].sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+      
+      if (sorted.length === 0) {
+        document.getElementById('eventsList').innerHTML = '<div class="empty-state">No events scheduled yet</div>';
+        return;
+      }
+
+      let html = '';
+      sorted.forEach(e => {
+        const regsForEvent = registrations[`reg-${e.id}`] || [];
+        const rsvpYes = regsForEvent.filter(r => r.rsvp === 'yes').length;
+        let tags = '';
+        if (e.recurring) tags += '<span class="badge badge-recurring">🔄 Recurring</span>';
+        if (e.tags && e.tags.length > 0) tags += `<span class="badge badge-files">🏷️ ${e.tags[0]}</span>`;
+
+        html += `<div class="event-row ${e.category}">
+          <div class="event-header">
+            <div class="event-info">
+              <h3>${e.title}</h3>
+              <p>${e.date} at ${e.time || 'TBA'} (${e.duration || 60} min)</p>
+              ${e.location ? `<p>📍 ${e.location}</p>` : ''}
+            </div>
+          </div>
+          <div class="event-meta">
+            ${tags}
+            <span class="meta-item">👥 ${regsForEvent.length} registered</span>
+            <span class="meta-item" style="background: #dcfce7; color: #15803d;">✅ ${rsvpYes} confirmed</span>
+            ${e.reminder ? '<span class="meta-item">🔔 Reminder set</span>' : ''}
+            ${e.smsEnabled ? '<span class="meta-item">📱 SMS enabled</span>' : ''}
+            ${e.shareWith && e.shareWith.length > 0 ? '<span class="meta-item">🔗 Shared</span>' : ''}
+          </div>
+          <div class="event-actions">
+            <button onclick="showRegistrations(${e.id})" class="btn-secondary btn-small">👥 Manage</button>
+            <button onclick="shareEvent(${e.id})" class="btn-secondary btn-small">🔗 Share Link</button>
+            <button onclick="editEvent(${e.id})" class="btn-secondary btn-small">✏️ Edit</button>
+            <button onclick="deleteEvent(${e.id})" class="btn-danger btn-small">🗑️</button>
+          </div>
+        </div>`;
+      });
+
+      document.getElementById('eventsList').innerHTML = html;
+    }
+
+    // Reports view
+    function renderReports() {
+      let html = '<h2 style="margin-bottom: 1.5rem;">📊 Event Reports & Analytics</h2>';
+      
+      if (events.length === 0) {
+        html += '<div class="empty-state">No events to report on</div>';
+        document.getElementById('reportContent').innerHTML = html;
+        return;
+      }
+
+      html += '<div class="chart-container"><h3 style="margin-bottom: 1rem;">Registrations by Event</h3>';
+      
+      const eventStats = events.map(e => ({
+        title: e.title,
+        registrations: (registrations[`reg-${e.id}`] || []).length,
+        confirmed: (registrations[`reg-${e.id}`] || []).filter(r => r.rsvp === 'yes').length
+      }));
+
+      const maxRegs = Math.max(...eventStats.map(e => e.registrations), 1);
+      
+      eventStats.forEach(stat => {
+        const width = (stat.registrations / maxRegs) * 100;
+        html += `<div class="chart-bar">
+          <div class="chart-label">${stat.title}</div>
+          <div class="chart-bar-fill" style="width: ${Math.max(width, 5)}%">${stat.registrations}</div>
+        </div>`;
+      });
+
+      html += '</div>';
+
+      // Summary stats
+      html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">';
+      const totalRegs = Object.values(registrations).reduce((sum, arr) => sum + arr.length, 0);
+      const totalConfirmed = Object.values(registrations).reduce((sum, arr) => sum + arr.filter(r => r.rsvp === 'yes').length, 0);
+      const attendanceRate = totalRegs > 0 ? Math.round((totalConfirmed / totalRegs) * 100) : 0;
+      
+      html += `
+        <div style="background: #e9d5ff; padding: 1rem; border-radius: 0.5rem;">
+          <p style="font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">Total Events</p>
+          <p style="font-size: 1.5rem; font-weight: bold; color: #6b21a8;">${events.length}</p>
+        </div>
+        <div style="background: #dbeafe; padding: 1rem; border-radius: 0.5rem;">
+          <p style="font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">Total Registrations</p>
+          <p style="font-size: 1.5rem; font-weight: bold; color: #0284c7;">${totalRegs}</p>
+        </div>
+        <div style="background: #dcfce7; padding: 1rem; border-radius: 0.5rem;">
+          <p style="font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">Confirmed Attendees</p>
+          <p style="font-size: 1.5rem; font-weight: bold; color: #16a34a;">${totalConfirmed}</p>
+        </div>
+        <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem;">
+          <p style="font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">Overall Confirmation Rate</p>
+          <p style="font-size: 1.5rem; font-weight: bold; color: #ea580c;">${attendanceRate}%</p>
+        </div>
+      `;
+      html += '</div>';
+
+      document.getElementById('reportContent').innerHTML = html;
+    }
+
+    // Registrations
+    function showRegistrations(eventId) {
+      currentEventId = eventId;
+      document.getElementById('regName').value = '';
+      document.getElementById('regEmail').value = '';
+      document.getElementById('regPhone').value = '';
+      document.getElementById('rsvpStatus').value = 'pending';
+      updateRegistrationsList();
+      document.getElementById('registrationsModal').classList.add('active');
+    }
+
+    function closeRegistrations() {
+      document.getElementById('registrationsModal').classList.remove('active');
+    }
+
+    function addRegistration() {
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const phone = document.getElementById('regPhone').value;
+      const rsvp = document.getElementById('rsvpStatus').value;
+
+      if (!name || !email || !phone) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      const key = `reg-${currentEventId}`;
+      if (!registrations[key]) registrations[key] = [];
+      registrations[key].push({
+        name,
+        email,
+        phone,
+        rsvp,
+        attended: false,
+        checkInTime: null,
+        time: new Date().toLocaleString()
+      });
+
+      saveData();
+      document.getElementById('regName').value = '';
+      document.getElementById('regEmail').value = '';
+      document.getElementById('regPhone').value = '';
+      document.getElementById('rsvpStatus').value = 'pending';
+      updateRegistrationsList();
+    }
+
+    function updateRegistrationsList() {
+      const key = `reg-${currentEventId}`;
+      const regs = registrations[key] || [];
+      document.getElementById('regCount').textContent = regs.length;
+
+      let html = '';
+      if (regs.length === 0) {
+        html = '<div class="empty-state">No registrations yet</div>';
+      } else {
+        regs.forEach((reg, i) => {
+          const rsvpBadges = {
+            'yes': '<span class="rsvp-badge rsvp-yes">✓ Yes</span>',
+            'no': '<span class="rsvp-badge rsvp-no">✗ No</span>',
+            'maybe': '<span class="rsvp-badge rsvp-maybe">? Maybe</span>',
+            'pending': '<span class="rsvp-badge" style="background: #e5e7eb; color: #4b5563;">⏳ Pending</span>'
+          };
+          html += `<div class="registration-item">
+            <p><strong>${reg.name}</strong> ${rsvpBadges[reg.rsvp] || ''}</p>
+            <p>📧 ${reg.email}</p>
+            <p>📱 ${reg.phone}</p>
+            <p style="color: #6b7280; font-size: 0.75rem;">Registered: ${reg.time}</p>
+          </div>`;
+        });
+      }
+      document.getElementById('registrationsList').innerHTML = html;
+    }
+
+    function renderAttendanceForm() {
+      const key = `reg-${currentEventId}`;
+      const regs = registrations[key] || [];
+
+      let html = '';
+      if (regs.length === 0) {
+        html = '<div class="empty-state">No registrations to mark attendance</div>';
+      } else {
+        regs.forEach((reg, i) => {
+          html += `<div class="registration-item" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <p><strong>${reg.name}</strong></p>
+              <p style="font-size: 0.75rem; color: #6b7280;">${reg.email}</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-success btn-small" onclick="markAttendance(${currentEventId}, ${i}, true)">✓ Present</button>
+              <button class="btn-danger btn-small" onclick="markAttendance(${currentEventId}, ${i}, false)">✗ Absent</button>
+            </div>
+          </div>`;
+        });
+      }
+      document.getElementById('attendanceList').innerHTML = html;
+    }
+
+    function markAttendance(eventId, index, attended) {
+      const key = `reg-${eventId}`;
+      registrations[key][index].attended = attended;
+      registrations[key][index].checkInTime = new Date().toLocaleString();
+      saveData();
+      renderAttendanceForm();
+      updateStats();
+    }
+
+    function renderAnalytics() {
+      const key = `reg-${currentEventId}`;
+      const regs = registrations[key] || [];
+      const attended = regs.filter(r => r.attended).length;
+      const absent = regs.filter(r => r.attended === false && r.checkInTime).length;
+      const pending = regs.filter(r => r.attended === undefined).length;
+      const rsvpYes = regs.filter(r => r.rsvp === 'yes').length;
+      const rsvpNo = regs.filter(r => r.rsvp === 'no').length;
+      const rsvpMaybe = regs.filter(r => r.rsvp === 'maybe').length;
+
+      const attendanceRate = regs.length > 0 ? Math.round((attended / regs.length) * 100) : 0;
+      const confirmationRate = regs.length > 0 ? Math.round((rsvpYes / regs.length) * 100) : 0;
+
+      let html = `
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background: #dcfce7; padding: 1rem; border-radius: 0.5rem;">
+            <p style="color: #15803d; font-size: 0.875rem;">Attended</p>
+            <p style="font-size: 1.75rem; font-weight: bold; color: #15803d;">${attended}</p>
+          </div>
+          <div style="background: #fee2e2; padding: 1rem; border-radius: 0.5rem;">
+            <p style="color: #dc2626; font-size: 0.875rem;">Absent</p>
+            <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626;">${absent}</p>
+          </div>
+          <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem;">
+            <p style="color: #ea580c; font-size: 0.875rem;">Attendance Rate</p>
+            <p style="font-size: 1.75rem; font-weight: bold; color: #ea580c;">${attendanceRate}%</p>
+          </div>
+          <div style="background: #eff6ff; padding: 1rem; border-radius: 0.5rem;">
+            <p style="color: #0284c7; font-size: 0.875rem;">Confirmation Rate</p>
+            <p style="font-size: 1.75rem; font-weight: bold; color: #0284c7;">${confirmationRate}%</p>
+          </div>
+        </div>
+        <h4 style="margin-bottom: 1rem; font-weight: bold;">RSVP Breakdown</h4>
+        <div class="chart-container">
+          <div class="chart-bar">
+            <div class="chart-label">Yes (Confirmed)</div>
+            <div class="chart-bar-fill" style="width: ${Math.max((rsvpYes / regs.length) * 100, 5)}%; background: #16a34a;">${rsvpYes}</div>
+          </div>
+          <div class="chart-bar">
+            <div class="chart-label">Maybe</div>
+            <div class="chart-bar-fill" style="width: ${Math.max((rsvpMaybe / regs.length) * 100, 5)}%; background: #ea580c;">${rsvpMaybe}</div>
+          </div>
+          <div class="chart-bar">
+            <div class="chart-label">No (Declined)</div>
+            <div class="chart-bar-fill" style="width: ${Math.max((rsvpNo / regs.length) * 100, 5)}%; background: #dc2626;">${rsvpNo}</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('analyticsContent').innerHTML = html;
+    }
+
+    function shareEvent(eventId) {
+      const event = events.find(e => e.id === eventId);
+      const shareLink = `${window.location.href}?event=${eventId}`;
+      alert(`Share this link:\n\n${shareLink}\n\nEvent: ${event.title}\nDate: ${event.date} at ${event.time}`);
+    }
+
+    function exportCSV() {
+      const key = `reg-${currentEventId}`;
+      const regs = registrations[key] || [];
+
+      if (regs.length === 0) {
+        alert('No registrations to export');
+        return;
+      }
+
+      let csv = 'Name,Email,Phone,RSVP Status,Attended,Check-in Time,Registered\n';
+      regs.forEach(r => {
+        const attended = r.attended === true ? 'Yes' : r.attended === false ? 'No' : 'Not Marked';
+        csv += `"${r.name}","${r.email}","${r.phone}","${r.rsvp}","${attended}","${r.checkInTime || 'N/A'}","${r.time}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `registrations-${currentEventId}.csv`;
+      a.click();
+    }
+
+    // Update stats
+    function updateStats() {
+      document.getElementById('totalEvents').textContent = events.length;
+      const totalRegs = Object.values(registrations).reduce((sum, arr) => sum + arr.length, 0);
+      document.getElementById('totalRegs').textContent = totalRegs;
+      const rsvpYesCount = Object.values(registrations).reduce((sum, arr) => sum + arr.filter(r => r.rsvp === 'yes').length, 0);
+      document.getElementById('rsvpYes').textContent = rsvpYesCount;
+      
+      const attendedCount = Object.values(registrations).reduce((sum, arr) => sum + arr.filter(r => r.attended === true).length, 0);
+      const attendanceRate = totalRegs > 0 ? Math.round((attendedCount / totalRegs) * 100) : 0;
+      document.getElementById('attendanceRate').textContent = attendanceRate + '%';
+    }
+
+    // Update UI
+    function updateUI() {
+      renderCalendar();
+      renderList();
+      if (currentView === 'reports') renderReports();
+      updateStats();
+    }
+
+    // Handle recurring events checkbox
+    setTimeout(function() {
+      const recurringCheckbox = document.getElementById('eventRecurring');
+      if (recurringCheckbox) {
+        recurringCheckbox.addEventListener('change', function() {
+          document.getElementById('recurringOptions').style.display = this.checked ? 'block' : 'none';
+        });
+      }
+    }, 100);
+
+    // Initialize
+    loadData();
+  </script>
+</body>
+</html>
+  </script>
+</body>
+</html>
