@@ -3,454 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enterprise Events Manager by Richard Aderounmu</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <title>Enterprise Events Manager by Ampla Metra</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #f3e8ff 0%, #eff6ff 100%);
-      min-height: 100vh;
-      padding: 1rem;
-    }
-    
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    
-    header {
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    h1 {
-      color: #6b21a8;
-      font-size: 2rem;
-    }
-    
-    .user-info {
-      background: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .user-info p {
-      font-size: 0.875rem;
-      color: #4b5563;
-      margin-bottom: 0.25rem;
-    }
-    
-    .subtitle {
-      color: #4b5563;
-      font-size: 0.875rem;
-    }
-    
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    
-    @media (max-width: 1024px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .card {
-      background: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      padding: 1.5rem;
-    }
-    
-    .button-group {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    
-    button {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.875rem;
-      transition: all 0.2s;
-    }
-    
-    .btn-view {
-      background: #f3f4f6;
-      color: #374151;
-    }
-    
-    .btn-view.active {
-      background: #9333ea;
-      color: white;
-    }
-    
-    .btn-view:hover {
-      background: #e5e7eb;
-    }
-    
-    .btn-view.active:hover {
-      background: #7e22ce;
-    }
-    
-    .btn-primary {
-      background: #9333ea;
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background: #7e22ce;
-    }
-    
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #1f2937;
-    }
-    
-    .btn-secondary:hover {
-      background: #d1d5db;
-    }
-    
-    .btn-danger {
-      background: #fee2e2;
-      color: #dc2626;
-      padding: 0.5rem;
-    }
-    
-    .btn-danger:hover {
-      background: #fecaca;
-    }
-    
-    .btn-success {
-      background: #16a34a;
-      color: white;
-    }
-    
-    .btn-success:hover {
-      background: #15803d;
-    }
-    
-    .btn-small {
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-    }
-    
-    .tabs {
-      display: flex;
-      gap: 1rem;
-      border-bottom: 2px solid #e5e7eb;
-      margin-bottom: 1.5rem;
-      overflow-x: auto;
-    }
-    
-    .tab {
-      padding: 0.75rem;
-      border: none;
-      background: none;
-      color: #4b5563;
-      cursor: pointer;
-      font-weight: 500;
-      border-bottom: 3px solid transparent;
-      white-space: nowrap;
-    }
-    
-    .tab.active {
-      color: #9333ea;
-      border-bottom-color: #9333ea;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 50;
-      align-items: center;
-      justify-content: center;
-      overflow-y: auto;
-      padding: 1rem;
-    }
-    
-    .modal.active {
-      display: flex;
-    }
-    
-    .modal-content {
-      background: white;
-      border-radius: 0.5rem;
-      max-width: 700px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 1.5rem;
-    }
-    
-    .modal-header {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #111827;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      color: #4b5563;
-      cursor: pointer;
-    }
-    
-    .form-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    
-    .form-group.full {
-      grid-template-columns: 1fr;
-    }
-    
-    label {
-      display: block;
-      font-size: 0.875rem;
-      color: #4b5563;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-    
-    input, select, textarea {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
-      font-size: 0.875rem;
-      font-family: inherit;
-    }
-    
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #9333ea;
-      box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-    }
-    
-    .alert {
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    
-    .alert-warning {
-      background: #fef3c7;
-      border: 1px solid #fcd34d;
-      color: #92400e;
-    }
-    
-    .alert-success {
-      background: #dcfce7;
-      border: 1px solid #86efac;
-      color: #15803d;
-    }
-    
-    .alert-error {
-      background: #fee2e2;
-      border: 1px solid #fecaca;
-      color: #dc2626;
-    }
-    
-    .stats-box {
-      background: white;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    
-    .stats-box.purple {
-      background: #f3e8ff;
-    }
-    
-    .stats-box.blue {
-      background: #eff6ff;
-    }
-    
-    .stats-box.green {
-      background: #f0fdf4;
-    }
-    
-    .stats-label {
-      color: #4b5563;
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .stats-number {
-      color: #9333ea;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    
-    .stats-box.blue .stats-number {
-      color: #0284c7;
-    }
-    
-    .stats-box.green .stats-number {
-      color: #16a34a;
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      color: #4b5563;
-    }
-    
-    .qr-container {
-      text-align: center;
-      padding: 1rem;
-      background: #f9fafb;
-      border-radius: 0.5rem;
-    }
-    
-    .vendor-item, .ticket-item {
-      background: #f9fafb;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
-      border-left: 4px solid #9333ea;
-    }
-    
-    .vendor-item h4, .ticket-item h4 {
-      color: #111827;
-      margin-bottom: 0.5rem;
-    }
-    
-    .vendor-item p, .ticket-item p {
-      color: #4b5563;
-      font-size: 0.875rem;
-      margin: 0.25rem 0;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f3e8ff 0%, #eff6ff 100%); min-height: 100vh; padding: 1rem; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    h1 { color: #6b21a8; font-size: 2rem; }
+    .tabs-container { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+    .tab-btn { padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 0.375rem 0.375rem 0 0; cursor: pointer; font-weight: 500; color: #4b5563; transition: all 0.3s; }
+    .tab-btn.active { background: #9333ea; color: white; }
+    .tab-btn:hover { background: #e5e7eb; }
+    .tab-btn.active:hover { background: #7e22ce; }
+    .card { background: white; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; }
+    .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; }
+    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+    button { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; font-size: 0.875rem; transition: all 0.2s; }
+    .btn-primary { background: #9333ea; color: white; }
+    .btn-primary:hover { background: #7e22ce; }
+    .btn-secondary { background: #e5e7eb; color: #1f2937; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-small { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
+    input, select, textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; margin-bottom: 0.5rem; font-family: inherit; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #9333ea; box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1); }
+    label { display: block; font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem; font-weight: 500; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 0.5rem; max-width: 600px; width: 100%; padding: 2rem; max-height: 90vh; overflow-y: auto; }
+    .modal-header { font-size: 1.5rem; font-weight: bold; color: #111827; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .close-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #4b5563; }
+    .form-group { margin-bottom: 1rem; }
+    .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #0c4a6e; }
+    .user-info { background: white; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .user-info p { color: #4b5563; font-size: 0.875rem; margin: 0.25rem 0; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    .stat-box { background: white; padding: 1rem; border-radius: 0.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #9333ea; }
+    .stat-label { color: #4b5563; font-size: 0.875rem; }
+    .stat-number { font-size: 1.75rem; font-weight: bold; color: #9333ea; margin-top: 0.5rem; }
+    .event-item { background: #f9fafb; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 4px solid #9333ea; }
+    .event-item h3 { color: #111827; margin-bottom: 0.5rem; }
+    .event-item p { color: #4b5563; font-size: 0.875rem; margin: 0.25rem 0; }
+    .empty { text-align: center; color: #4b5563; padding: 2rem; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin: 1rem 0; }
+    .calendar-day { border: 1px solid #e5e7eb; padding: 0.5rem; min-height: 80px; border-radius: 0.375rem; font-size: 0.75rem; }
+    .calendar-day.other-month { background: #f9fafb; }
+    .calendar-header { font-weight: bold; text-align: center; padding: 0.5rem; }
+    .rsvp-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem; font-weight: bold; margin: 0.25rem; }
+    .rsvp-yes { background: #dcfce7; color: #15803d; }
+    .rsvp-no { background: #fee2e2; color: #dc2626; }
+    .rsvp-maybe { background: #fef3c7; color: #92400e; }
+    .rsvp-pending { background: #e5e7eb; color: #4b5563; }
+    .form-group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .chart-bar { display: flex; align-items: center; margin-bottom: 1rem; }
+    .chart-label { width: 120px; font-size: 0.875rem; font-weight: 500; }
+    .chart-bar-fill { height: 30px; background: #9333ea; border-radius: 0.25rem; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5rem; color: white; font-weight: bold; min-width: 40px; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div>
-        <h1>Events Manager by Ampla Metra</h1>
-        <p class="subtitle">Enterprise event management system</p>
-      </div>
-      <div class="user-info">
-        <p>Logged in as:</p>
-        <p style="font-weight: bold; color: #111827;" id="currentUser">Admin User</p>
-        <button class="btn-secondary btn-small" onclick="logout()">Logout</button>
+        <h1>Zik Prize Awards</h1>
+        <p style="color: #4b5563;">Events Manager by Ampla Metra</p>
       </div>
     </header>
 
-    <div class="main-grid">
-      <div>
-        <div class="card">
-          <div class="button-group">
-            <button class="btn-view active" onclick="setView('events')">Events</button>
-            <button class="btn-view" onclick="setView('vendors')">Vendors</button>
-            <button class="btn-view" onclick="setView('budget')">Budget</button>
-            <button class="btn-view" onclick="setView('tickets')">Tickets</button>
-            <button class="btn-primary" onclick="showEventForm()" style="margin-left: auto;">New Event</button>
-          </div>
+    <div id="appContent">
+      <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('events')">📅 Events</button>
+        <button class="tab-btn" onclick="switchTab('registrations')">👥 Registrations</button>
+        <button class="tab-btn" onclick="switchTab('vendors')">🏢 Vendors</button>
+        <button class="tab-btn" onclick="switchTab('budget')">💰 Budget</button>
+        <button class="tab-btn" onclick="switchTab('awards')">🏆 Awards</button>
+        <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytics</button>
+      </div>
 
-          <div id="eventsView" class="view-section">
-            <div id="eventsList" style="display: flex; flex-direction: column; gap: 1rem;"></div>
-          </div>
-
-          <div id="vendorsView" class="view-section" style="display: none;">
-            <button class="btn-primary" onclick="showVendorForm()" style="margin-bottom: 1rem;">Add Vendor</button>
-            <div id="vendorsList" style="display: flex; flex-direction: column; gap: 1rem;"></div>
-          </div>
-
-          <div id="budgetView" class="view-section" style="display: none;">
-            <div id="budgetContent"></div>
-          </div>
-
-          <div id="ticketsView" class="view-section" style="display: none;">
-            <button class="btn-primary" onclick="generateAllTickets()" style="margin-bottom: 1rem;">Generate QR Tickets</button>
-            <div id="ticketsList" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+      <div class="main-grid">
+        <div id="mainContent"></div>
+        
+        <div>
+          <div class="card">
+            <h3 style="font-weight: bold; margin-bottom: 1rem;">Dashboard</h3>
+            <div class="stats" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <div class="stat-box">
+                <div class="stat-label">Events</div>
+                <div class="stat-number" id="statEvents">0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Attendees</div>
+                <div class="stat-number" id="statAttendees">0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Vendors</div>
+                <div class="stat-number" id="statVendors">0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Budget</div>
+                <div class="stat-number" id="statBudget" style="font-size: 1.25rem;">₦0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">RSVP Yes</div>
+                <div class="stat-number" style="color: #15803d;" id="statRsvpYes">0</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div>
-        <div class="card">
-          <h3 style="font-weight: bold; margin-bottom: 1rem;">Dashboard</h3>
-          <div class="stats-box purple">
-            <div class="stats-label">Total Events</div>
-            <div class="stats-number" id="totalEvents">0</div>
-          </div>
-          <div class="stats-box blue">
-            <div class="stats-label">Total Registrations</div>
-            <div class="stats-number" id="totalRegs">0</div>
-          </div>
-          <div class="stats-box green">
-            <div class="stats-label">Total Budget</div>
-            <div class="stats-number" id="totalBudget">$0</div>
-          </div>
-          <div class="stats-box purple">
-            <div class="stats-label">Vendors</div>
-            <div class="stats-number" id="totalVendors">0</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Login Modal -->
-  <div id="loginModal" class="modal active">
-    <div class="modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <span>Events Manager Login</span>
-      </div>
-      <div class="form-group full">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="your@email.com" value="admin@ampla.com">
-      </div>
-      <div class="form-group full">
-        <label>Password</label>
-        <input type="password" id="loginPassword" placeholder="Password" value="demo">
-      </div>
-      <div class="form-group full">
-        <label>Role</label>
-        <select id="loginRole">
-          <option value="admin">Admin (Full Access)</option>
-          <option value="manager">Event Manager</option>
-          <option value="viewer">Viewer (Read-only)</option>
-        </select>
-      </div>
-      <button class="btn-primary" onclick="login()" style="width: 100%;">Login</button>
-      <p style="text-align: center; margin-top: 1rem; color: #4b5563; font-size: 0.875rem;">Demo credentials: admin@ampla.com / demo</p>
     </div>
   </div>
 
@@ -458,202 +119,321 @@
   <div id="eventModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <span id="modalTitle">Create New Event</span>
+        <span>Create New Event</span>
         <button class="close-btn" onclick="closeEventForm()">×</button>
       </div>
       <div class="form-group">
-        <div>
-          <label>Event Title *</label>
-          <input type="text" id="eventTitle" placeholder="Event title">
-        </div>
-        <div>
-          <label>Date *</label>
+        <label>Event Title</label>
+        <input type="text" id="eventTitle" placeholder="e.g., Zik Prize Awards Ceremony">
+      </div>
+      <div class="form-group-row">
+        <div class="form-group">
+          <label>Date</label>
           <input type="date" id="eventDate">
         </div>
-      </div>
-      <div class="form-group">
-        <div>
+        <div class="form-group">
           <label>Time</label>
           <input type="time" id="eventTime">
         </div>
-        <div>
-          <label>Location</label>
-          <input type="text" id="eventLocation">
-        </div>
-      </div>
-      <div class="form-group full">
-        <label>Description</label>
-        <textarea id="eventDescription"></textarea>
       </div>
       <div class="form-group">
-        <div>
-          <label>Budget ($)</label>
-          <input type="number" id="eventBudget" value="0">
+        <label>Location</label>
+        <input type="text" id="eventLocation" placeholder="Venue location">
+      </div>
+      <div class="form-group-row">
+        <div class="form-group">
+          <label>Budget (₦)</label>
+          <input type="number" id="eventBudget" value="0" step="1000">
         </div>
-        <div>
+        <div class="form-group">
           <label>Expected Attendees</label>
           <input type="number" id="eventAttendees" value="0">
         </div>
       </div>
-      <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button class="btn-secondary" onclick="closeEventForm()">Cancel</button>
-        <button class="btn-primary" onclick="saveEvent()">Save Event</button>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="eventDescription" placeholder="Event details" style="min-height: 80px;"></textarea>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn-secondary" onclick="closeEventForm()" style="flex: 1;">Cancel</button>
+        <button class="btn-primary" onclick="saveEvent()" style="flex: 1;">Save Event</button>
       </div>
     </div>
   </div>
 
-  <!-- Vendor Form Modal -->
+  <!-- Attendee Modal -->
+  <div id="attendeeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Register Attendee</span>
+        <button class="close-btn" onclick="closeAttendeeForm()">×</button>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="attendeeName" placeholder="Attendee name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="attendeeEmail" placeholder="Email address">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="attendeePhone" placeholder="Phone number">
+      </div>
+      <div class="form-group-row">
+        <div class="form-group">
+          <label>RSVP Status</label>
+          <select id="attendeeRsvp">
+            <option value="pending">Pending</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="maybe">Maybe</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="attendeeCategory">
+            <option value="guest">Guest</option>
+            <option value="vip">VIP</option>
+            <option value="media">Media</option>
+            <option value="vendor">Vendor</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Physical Address</label>
+        <textarea id="attendeeAddress" placeholder="For invitation cards" style="min-height: 60px;"></textarea>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn-secondary" onclick="closeAttendeeForm()" style="flex: 1;">Cancel</button>
+        <button class="btn-primary" onclick="saveAttendee()" style="flex: 1;">Save Attendee</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor Modal -->
   <div id="vendorModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <span>Add Vendor</span>
         <button class="close-btn" onclick="closeVendorForm()">×</button>
       </div>
-      <div class="form-group full">
-        <label>Vendor Name *</label>
+      <div class="form-group">
+        <label>Vendor Name</label>
         <input type="text" id="vendorName" placeholder="Company name">
       </div>
       <div class="form-group">
-        <div>
+        <label>Category</label>
+        <select id="vendorCategory">
+          <option value="catering">Catering</option>
+          <option value="decoration">Decoration</option>
+          <option value="sound">Sound & AV</option>
+          <option value="photography">Photography</option>
+          <option value="banners">Banners</option>
+          <option value="brochure">Brochure</option>
+          <option value="moc">Master of Ceremony</option>
+          <option value="hospitality">Hospitality</option>
+          <option value="invitations">Invitation Cards</option>
+          <option value="distribution">Distribution</option>
+          <option value="interviews">Interviews/Documentaries</option>
+          <option value="social-media">Social Media</option>
+          <option value="press">Press Mention</option>
+          <option value="tv-ads">TV Ads</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group-row">
+        <div class="form-group">
           <label>Contact Email</label>
-          <input type="email" id="vendorEmail" placeholder="vendor@email.com">
+          <input type="email" id="vendorEmail" placeholder="Email">
         </div>
-        <div>
+        <div class="form-group">
           <label>Contact Phone</label>
-          <input type="tel" id="vendorPhone" placeholder="+1234567890">
+          <input type="tel" id="vendorPhone" placeholder="Phone">
         </div>
       </div>
-      <div class="form-group">
-        <div>
-          <label>Service Category</label>
-          <select id="vendorCategory">
-            <option value="catering">Catering</option>
-            <option value="decoration">Decoration</option>
-            <option value="sound">Sound & AV</option>
-            <option value="photography">Photography</option>
-            <option value="transportation">Transportation</option>
-            <option value="security">Security</option>
-            <option value="other">Other</option>
-          </select>
+      <div class="form-group-row">
+        <div class="form-group">
+          <label>Cost (₦)</label>
+          <input type="number" id="vendorCost" value="0" step="1000">
         </div>
-        <div>
-          <label>Cost ($)</label>
-          <input type="number" id="vendorCost" placeholder="0.00">
-        </div>
-      </div>
-      <div class="form-group full">
-        <label>Contract Details</label>
-        <textarea id="vendorContract" placeholder="Terms, conditions, deliverables"></textarea>
-      </div>
-      <div class="form-group">
-        <div>
-          <label>Payment Status</label>
-          <select id="vendorPayment">
-            <option value="pending">Pending</option>
-            <option value="partial">Partial</option>
-            <option value="paid">Paid</option>
-          </select>
-        </div>
-        <div>
+        <div class="form-group">
           <label>Rating (1-5)</label>
-          <input type="number" id="vendorRating" min="1" max="5">
+          <input type="number" id="vendorRating" min="1" max="5" value="5">
         </div>
       </div>
-      <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button class="btn-secondary" onclick="closeVendorForm()">Cancel</button>
-        <button class="btn-primary" onclick="saveVendor()">Save Vendor</button>
+      <div class="form-group">
+        <label>Payment Status</label>
+        <select id="vendorPayment">
+          <option value="pending">Pending</option>
+          <option value="partial">Partial</option>
+          <option value="paid">Paid</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Checklist (comma-separated)</label>
+        <textarea id="vendorChecklist" placeholder="e.g., Setup, Equipment, Delivery, Follow-up" style="min-height: 60px;"></textarea>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn-secondary" onclick="closeVendorForm()" style="flex: 1;">Cancel</button>
+        <button class="btn-primary" onclick="saveVendor()" style="flex: 1;">Save Vendor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Award Modal -->
+  <div id="awardModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Add Award Category</span>
+        <button class="close-btn" onclick="closeAwardForm()">×</button>
+      </div>
+      <div class="form-group">
+        <label>Category Name</label>
+        <input type="text" id="awardName" placeholder="e.g., Best Male Artist">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="awardDescription" placeholder="Category details"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Master of Ceremony / Host Name</label>
+        <input type="text" id="mocName" placeholder="MC name">
+      </div>
+      <div class="form-group">
+        <label>Nominees (comma-separated)</label>
+        <textarea id="nominees" placeholder="Nominee 1, Nominee 2, Nominee 3"></textarea>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn-secondary" onclick="closeAwardForm()" style="flex: 1;">Cancel</button>
+        <button class="btn-primary" onclick="saveAward()" style="flex: 1;">Save Category</button>
       </div>
     </div>
   </div>
 
   <script>
     let events = [];
+    let attendees = [];
     let vendors = [];
-    let registrations = {};
-    let tickets = {};
-    let currentView = 'events';
+    let awards = [];
     let currentUser = null;
-    let userRole = null;
+    let currentEventId = null;
 
-    // Authentication
+    const users = [
+      { username: 'admin', password: 'admin123', role: 'Admin' },
+      { username: 'manager', password: 'manager123', role: 'Manager' },
+      { username: 'viewer', password: 'viewer123', role: 'Viewer' }
+    ];
+
     function login() {
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const role = document.getElementById('loginRole').value;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-      if (!email || !password) {
-        alert('Please enter credentials');
+      if (!username || !password) {
+        alert('Please enter username and password');
         return;
       }
 
-      currentUser = { email, role };
-      userRole = role;
-      document.getElementById('currentUser').textContent = email;
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (!user) {
+        alert('Invalid credentials');
+        return;
+      }
+
+      currentUser = { username: user.username, role: user.role };
+      document.getElementById('userName').textContent = user.username;
+      document.getElementById('userRole').textContent = user.role;
       document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('userPanel').style.display = 'block';
+      document.getElementById('appContent').style.display = 'block';
       loadData();
+      switchTab('events');
     }
 
     function logout() {
-      if (confirm('Are you sure you want to logout?')) {
+      if (confirm('Logout?')) {
         currentUser = null;
-        userRole = null;
         document.getElementById('loginModal').classList.add('active');
-        document.getElementById('eventsList').innerHTML = '';
+        document.getElementById('userPanel').style.display = 'none';
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
       }
     }
 
-    function checkPermission(action) {
-      if (!userRole) return false;
-      if (userRole === 'admin') return true;
-      if (userRole === 'manager') return action !== 'delete';
-      if (userRole === 'viewer') return action === 'view';
-      return false;
-    }
-
-    // Data Management
-    function loadData() {
-      const saved = localStorage.getItem('ampla-events');
-      if (saved) events = JSON.parse(saved);
-      const vendorsSaved = localStorage.getItem('ampla-vendors');
-      if (vendorsSaved) vendors = JSON.parse(vendorsSaved);
-      const regsSaved = localStorage.getItem('ampla-registrations');
-      if (regsSaved) registrations = JSON.parse(regsSaved);
-      const ticketsSaved = localStorage.getItem('ampla-tickets');
-      if (ticketsSaved) tickets = JSON.parse(ticketsSaved);
-      updateUI();
-    }
-
-    function saveData() {
-      localStorage.setItem('ampla-events', JSON.stringify(events));
-      localStorage.setItem('ampla-vendors', JSON.stringify(vendors));
-      localStorage.setItem('ampla-registrations', JSON.stringify(registrations));
-      localStorage.setItem('ampla-tickets', JSON.stringify(tickets));
-    }
-
-    // View switching
-    function setView(view) {
-      currentView = view;
-      document.querySelectorAll('.btn-view').forEach(btn => btn.classList.remove('active'));
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
-      document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
-      document.getElementById(view + 'View').style.display = 'block';
-      updateUI();
+
+      if (tab === 'events') renderEvents();
+      else if (tab === 'registrations') renderRegistrations();
+      else if (tab === 'vendors') renderVendors();
+      else if (tab === 'budget') renderBudget();
+      else if (tab === 'awards') renderAwards();
+      else if (tab === 'analytics') renderAnalytics();
+    }
+    function renderEvents() {
+      let html = '<button class="btn-primary" onclick="showEventForm()" style="margin-bottom: 1rem;">+ New Event</button>';
+      html += '<div class="card"><h3>Events List</h3>';
+      
+      if (events.length === 0) {
+        html += '<div class="empty">No events yet</div>';
+      } else {
+        events.forEach(e => {
+          const attCount = attendees.filter(a => a.eventId === e.id).length;
+          html += '<div class="event-item">';
+          html += '<h3>' + e.title + '</h3>';
+          html += '<p>📅 ' + e.date + ' at ' + e.time + '</p>';
+          html += '<p>📍 ' + e.location + '</p>';
+          html += '<p>💰 ₦' + e.budget.toLocaleString() + ' | 👥 ' + attCount + ' attendees</p>';
+          html += '<button class="btn-secondary btn-small" onclick="manageEvent(' + e.id + ')">Manage</button>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      
+      // Calendar
+      html += '<div class="card"><h3>Calendar</h3>' + renderCalendar() + '</div>';
+      document.getElementById('mainContent').innerHTML = html;
     }
 
-    // Events
-    function showEventForm() {
-      if (!checkPermission('create')) {
-        alert('You do not have permission to create events');
-        return;
+    function renderCalendar() {
+      const today = new Date();
+      const month = today.getMonth();
+      const year = today.getFullYear();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+      let html = '<div class="calendar">';
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
+        html += '<div class="calendar-header">' + d + '</div>';
+      });
+
+      for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate);
+        const dateStr = date.toISOString().split('T')[0];
+        const eventOnDate = events.find(e => e.date === dateStr);
+        html += '<div class="calendar-day ' + (date.getMonth() !== month ? 'other-month' : '') + '">';
+        html += '<strong>' + date.getDate() + '</strong>';
+        if (eventOnDate) html += '<p style="color: #9333ea; font-weight: bold;">📌</p>';
+        html += '</div>';
+        startDate.setDate(startDate.getDate() + 1);
       }
+      html += '</div>';
+      return html;
+    }
+
+    function showEventForm() {
       document.getElementById('eventTitle').value = '';
       document.getElementById('eventDate').value = '';
       document.getElementById('eventTime').value = '';
       document.getElementById('eventLocation').value = '';
-      document.getElementById('eventDescription').value = '';
       document.getElementById('eventBudget').value = '0';
       document.getElementById('eventAttendees').value = '0';
-      document.getElementById('modalTitle').textContent = 'Create New Event';
+      document.getElementById('eventDescription').value = '';
       document.getElementById('eventModal').classList.add('active');
     }
 
@@ -662,379 +442,83 @@
     }
 
     function saveEvent() {
-      const title = document.getElementById('eventTitle').value;
+      const title = document.getElementById('eventTitle').value.trim();
       const date = document.getElementById('eventDate').value;
 
       if (!title || !date) {
-        alert('Please fill in title and date');
+        alert('Please fill title and date');
         return;
       }
 
-      const eventData = {
+      events.push({
         id: Date.now(),
-        title,
-        date,
+        title: title,
+        date: date,
         time: document.getElementById('eventTime').value,
         location: document.getElementById('eventLocation').value,
-        description: document.getElementById('eventDescription').value,
-        budget: parseFloat(document.getElementById('eventBudget').value),
-        expectedAttendees: parseInt(document.getElementById('eventAttendees').value),
-        createdBy: currentUser.email,
-        createdAt: new Date().toLocaleString(),
-        status: 'active'
-      };
+        budget: parseInt(document.getElementById('eventBudget').value),
+        attendees: parseInt(document.getElementById('eventAttendees').value),
+        description: document.getElementById('eventDescription').value
+      });
 
-      events.push(eventData);
       saveData();
-      updateUI();
       closeEventForm();
-      alert('Event created successfully!');
-    }
-
-    function deleteEvent(id) {
-      if (!checkPermission('delete')) {
-        alert('You do not have permission to delete events');
-        return;
-      }
-      if (confirm('Delete this event?')) {
-        events = events.filter(e => e.id !== id);
-        saveData();
-        updateUI();
-      }
-    }
-
-    function renderEvents() {
-      if (events.length === 0) {
-        document.getElementById('eventsList').innerHTML = '<div class="empty-state">No events created yet</div>';
-        return;
-      }
-
-      let html = '';
-      events.forEach(event => {
-        const regsCount = (registrations[`reg-${event.id}`] || []).length;
-        html += `<div class="vendor-item">
-          <h4>${event.title}</h4>
-          <p>Date: ${event.date} at ${event.time}</p>
-          <p>Location: ${event.location}</p>
-          <p>Budget: $${event.budget} | Expected Attendees: ${event.expectedAttendees} | Registered: ${regsCount}</p>
-          <p style="color: #6b7280; font-size: 0.75rem;">Created by: ${event.createdBy}</p>
-          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-            <button class="btn-primary btn-small" onclick="manageEvent(${event.id})">Manage</button>
-            <button class="btn-secondary btn-small" onclick="viewBudget(${event.id})">Budget</button>
-            ${checkPermission('delete') ? `<button class="btn-danger btn-small" onclick="deleteEvent(${event.id})">Delete</button>` : ''}
-          </div>
-        </div>`;
-      });
-      document.getElementById('eventsList').innerHTML = html;
-    }
-
-    function manageEvent(eventId) {
-      alert('Manage Event: ' + events.find(e => e.id === eventId).title + '\n\nFeature coming soon!');
-    }
-
-    // Vendors
-    function showVendorForm() {
-      if (!checkPermission('create')) {
-        alert('You do not have permission to add vendors');
-        return;
-      }
-      document.getElementById('vendorName').value = '';
-      document.getElementById('vendorEmail').value = '';
-      document.getElementById('vendorPhone').value = '';
-      document.getElementById('vendorCategory').value = 'catering';
-      document.getElementById('vendorCost').value = '';
-      document.getElementById('vendorContract').value = '';
-      document.getElementById('vendorPayment').value = 'pending';
-      document.getElementById('vendorRating').value = '';
-      document.getElementById('vendorModal').classList.add('active');
-    }
-
-    function closeVendorForm() {
-      document.getElementById('vendorModal').classList.remove('active');
-    }
-
-    function saveVendor() {
-      const name = document.getElementById('vendorName').value;
-      if (!name) {
-        alert('Please enter vendor name');
-        return;
-      }
-
-      const vendorData = {
-        id: Date.now(),
-        name,
-        email: document.getElementById('vendorEmail').value,
-        phone: document.getElementById('vendorPhone').value,
-        category: document.getElementById('vendorCategory').value,
-        cost: parseFloat(document.getElementById('vendorCost').value) || 0,
-        contract: document.getElementById('vendorContract').value,
-        paymentStatus: document.getElementById('vendorPayment').value,
-        rating: parseFloat(document.getElementById('vendorRating').value) || 0,
-        addedBy: currentUser.email,
-        addedAt: new Date().toLocaleString()
-      };
-
-      vendors.push(vendorData);
-      saveData();
-      updateUI();
-      closeVendorForm();
-      alert('Vendor added successfully!');
-    }
-
-    function deleteVendor(id) {
-      if (!checkPermission('delete')) {
-        alert('You do not have permission to delete vendors');
-        return;
-      }
-      if (confirm('Delete this vendor?')) {
-        vendors = vendors.filter(v => v.id !== id);
-        saveData();
-        updateUI();
-      }
-    }
-
-    function renderVendors() {
-      if (vendors.length === 0) {
-        document.getElementById('vendorsList').innerHTML = '<div class="empty-state">No vendors added yet</div>';
-        return;
-      }
-
-      let html = '';
-      vendors.forEach(vendor => {
-        const stars = '⭐'.repeat(vendor.rating);
-        html += `<div class="vendor-item">
-          <h4>${vendor.name} ${stars}</h4>
-          <p>Category: ${vendor.category}</p>
-          <p>Email: ${vendor.email} | Phone: ${vendor.phone}</p>
-          <p>Cost: $${vendor.cost.toFixed(2)} | Status: ${vendor.paymentStatus}</p>
-          <p>Contract: ${vendor.contract}</p>
-          <p style="color: #6b7280; font-size: 0.75rem;">Added by: ${vendor.addedBy}</p>
-          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-            <button class="btn-secondary btn-small" onclick="editVendor(${vendor.id})">Edit</button>
-            ${checkPermission('delete') ? `<button class="btn-danger btn-small" onclick="deleteVendor(${vendor.id})">Delete</button>` : ''}
-          </div>
-        </div>`;
-      });
-      document.getElementById('vendorsList').innerHTML = html;
-    }
-
-    function editVendor(id) {
-      const vendor = vendors.find(v => v.id === id);
-      if (!vendor) return;
-      document.getElementById('vendorName').value = vendor.name;
-      document.getElementById('vendorEmail').value = vendor.email;
-      document.getElementById('vendorPhone').value = vendor.phone;
-      document.getElementById('vendorCategory').value = vendor.category;
-      document.getElementById('vendorCost').value = vendor.cost;
-      document.getElementById('vendorContract').value = vendor.contract;
-      document.getElementById('vendorPayment').value = vendor.paymentStatus;
-      document.getElementById('vendorRating').value = vendor.rating;
-      vendors = vendors.filter(v => v.id !== id);
-      saveData();
-      document.getElementById('vendorModal').classList.add('active');
-    }
-
-    // Budget
-    function viewBudget(eventId) {
-      const event = events.find(e => e.id === eventId);
-      const eventVendors = vendors.filter(v => v.id === eventId || !v.eventId);
-      const totalVendorCost = eventVendors.reduce((sum, v) => sum + v.cost, 0);
-      const remaining = event.budget - totalVendorCost;
-
-      alert(`Budget for: ${event.title}\n\nTotal Budget: $${event.budget.toFixed(2)}\nVendor Costs: $${totalVendorCost.toFixed(2)}\nRemaining: $${remaining.toFixed(2)}`);
-    }
-
-    function renderBudget() {
-      if (events.length === 0) {
-        document.getElementById('budgetContent').innerHTML = '<div class="empty-state">No events to show budget for</div>';
-        return;
-      }
-
-      const totalEventBudget = events.reduce((sum, e) => sum + e.budget, 0);
-      const totalVendorCost = vendors.reduce((sum, v) => sum + v.cost, 0);
-      const paidAmount = vendors.filter(v => v.paymentStatus === 'paid').reduce((sum, v) => sum + v.cost, 0);
-      const pendingAmount = vendors.filter(v => v.paymentStatus === 'pending').reduce((sum, v) => sum + v.cost, 0);
-      const remaining = totalEventBudget - totalVendorCost;
-
-      let html = `
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-          <div style="background: #f3e8ff; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #9333ea;">
-            <p style="color: #4b5563; font-size: 0.875rem;">Total Budget</p>
-            <p style="font-size: 1.5rem; font-weight: bold; color: #6b21a8;">${totalEventBudget.toFixed(2)}</p>
-          </div>
-          <div style="background: #dbeafe; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #0284c7;">
-            <p style="color: #4b5563; font-size: 0.875rem;">Vendor Costs</p>
-            <p style="font-size: 1.5rem; font-weight: bold; color: #0284c7;">${totalVendorCost.toFixed(2)}</p>
-          </div>
-          <div style="background: #dcfce7; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #16a34a;">
-            <p style="color: #4b5563; font-size: 0.875rem;">Paid</p>
-            <p style="font-size: 1.5rem; font-weight: bold; color: #16a34a;">${paidAmount.toFixed(2)}</p>
-          </div>
-          <div style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #ea580c;">
-            <p style="color: #4b5563; font-size: 0.875rem;">Pending</p>
-            <p style="font-size: 1.5rem; font-weight: bold; color: #ea580c;">${pendingAmount.toFixed(2)}</p>
-          </div>
-        </div>
-
-        <div style="background: ${remaining >= 0 ? '#dcfce7' : '#fee2e2'}; padding: 1rem; border-radius: 0.5rem; border: 2px solid ${remaining >= 0 ? '#86efac' : '#fecaca'}; margin-bottom: 1.5rem;">
-          <p style="font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem;">Remaining Budget</p>
-          <p style="font-size: 2rem; font-weight: bold; color: ${remaining >= 0 ? '#15803d' : '#dc2626'};">${remaining.toFixed(2)}</p>
-          ${remaining < 0 ? `<p style="color: #dc2626; font-size: 0.875rem; margin-top: 0.5rem;">⚠️ Over budget by ${Math.abs(remaining).toFixed(2)}</p>` : ''}
-        </div>
-
-        <h3 style="font-weight: bold; margin-bottom: 1rem;">Payment Breakdown</h3>
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-          ${vendors.map(v => `
-            <div style="background: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <p style="font-weight: bold; color: #111827; font-size: 0.875rem;">${v.name}</p>
-                <p style="color: #4b5563; font-size: 0.75rem;">${v.category}</p>
-              </div>
-              <div style="text-align: right;">
-                <p style="font-weight: bold; color: #111827;">${v.cost.toFixed(2)}</p>
-                <p style="color: ${v.paymentStatus === 'paid' ? '#15803d' : v.paymentStatus === 'partial' ? '#ea580c' : '#dc2626'}; font-size: 0.75rem;">${v.paymentStatus}</p>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-      document.getElementById('budgetContent').innerHTML = html;
-    }
-
-    // Tickets & QR Codes
-    function generateAllTickets() {
-      if (events.length === 0) {
-        alert('Please create an event first');
-        return;
-      }
-
-      const event = events[0]; // For demo, use first event
-      const regs = registrations[`reg-${event.id}`] || [];
-
-      if (regs.length === 0) {
-        alert('Please register attendees first');
-        return;
-      }
-
-      regs.forEach((reg, i) => {
-        const ticketId = `TICKET-${event.id}-${i}-${Date.now()}`;
-        tickets[ticketId] = {
-          id: ticketId,
-          attendee: reg.name,
-          event: event.title,
-          date: event.date,
-          time: event.time,
-          location: event.location,
-          generatedAt: new Date().toLocaleString()
-        };
-      });
-
-      saveData();
-      renderTickets();
-      alert(`✅ Generated ${regs.length} tickets with QR codes!`);
-    }
-
-    function renderTickets() {
-      if (Object.keys(tickets).length === 0) {
-        document.getElementById('ticketsList').innerHTML = '<div class="empty-state">No tickets generated yet</div>';
-        return;
-      }
-
-      let html = '';
-      Object.values(tickets).forEach(ticket => {
-        html += '<div class="ticket-item">';
-        html += '<h4>' + ticket.attendee + '</h4>';
-        html += '<p>Event: ' + ticket.event + '</p>';
-        html += '<p>Date: ' + ticket.date + ' at ' + ticket.time + '</p>';
-        html += '<p>Location: ' + ticket.location + '</p>';
-        html += '<div class="qr-container" id="qr-' + ticket.id + '"></div>';
-        html += '<p style="color: #6b7280; font-size: 0.75rem; text-align: center; margin-top: 0.5rem;">ID: ' + ticket.id + '</p>';
-        html += '<button class="btn-primary btn-small" onclick="printTicket(\'' + ticket.id + '\')" style="width: 100%; margin-top: 0.75rem;">Print Ticket</button>';
-        html += '</div>';
-      });
-      document.getElementById('ticketsList').innerHTML = html;
-
-      // Generate QR codes
-      setTimeout(() => {
-        Object.values(tickets).forEach(ticket => {
-          const container = document.getElementById('qr-' + ticket.id);
-          if (container && container.innerHTML === '') {
-            new QRCode(container, {
-              text: ticket.id,
-              width: 150,
-              height: 150,
-              colorDark: '#9333ea',
-              colorLight: '#ffffff',
-              correctLevel: QRCode.CorrectLevel.H
-            });
-          }
-        });
-      }, 100);
-    }
-
-    function printTicket(ticketId) {
-      const ticket = tickets[ticketId];
-      let printWindow = window.open('', '', 'height=600,width=400');
-      let html = '<html><head><title>Ticket</title><style>';
-      html += 'body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }';
-      html += '.ticket { border: 3px solid #9333ea; padding: 30px; max-width: 300px; margin: 0 auto; }';
-      html += 'h1 { color: #6b21a8; font-size: 24px; margin: 0 0 15px 0; }';
-      html += 'p { margin: 10px 0; font-size: 14px; }';
-      html += '.qr { margin: 20px 0; }';
-      html += '</style></head><body>';
-      html += '<div class="ticket">';
-      html += '<h1>Event Ticket</h1>';
-      html += '<p><strong>' + ticket.attendee + '</strong></p>';
-      html += '<p style="font-size: 12px; color: #666;">' + ticket.event + '</p>';
-      html += '<p style="font-size: 12px; color: #666;">' + ticket.date + ' at ' + ticket.time + '</p>';
-      html += '<p style="font-size: 12px; color: #666;">' + ticket.location + '</p>';
-      html += '<div class="qr" id="printQr"></div>';
-      html += '<p style="font-size: 10px; color: #999;">ID: ' + ticketId + '</p>';
-      html += '</div>';
-      html += '</body></html>';
-      printWindow.document.write(html);
-      printWindow.document.close();
-      
-      setTimeout(() => {
-        new QRCode(printWindow.document.getElementById('printQr'), {
-          text: ticketId,
-          width: 150,
-          height: 150,
-          colorDark: '#9333ea',
-          colorLight: '#ffffff'
-        });
-        printWindow.print();
-      }, 500);
-    }
-
-    // Update Stats
-    function updateStats() {
-      document.getElementById('totalEvents').textContent = events.length;
-      const totalRegs = Object.values(registrations).reduce((sum, arr) => sum + arr.length, 0);
-      document.getElementById('totalRegs').textContent = totalRegs;
-      const totalBudget = events.reduce((sum, e) => sum + e.budget, 0);
-      document.getElementById('totalBudget').textContent = ' + totalBudget.toFixed(2);
-      document.getElementById('totalVendors').textContent = vendors.length;
-    }
-
-    // Update UI
-    function updateUI() {
-      if (!currentUser) return;
-      
-      if (currentView === 'events') renderEvents();
-      if (currentView === 'vendors') renderVendors();
-      if (currentView === 'budget') renderBudget();
-      if (currentView === 'tickets') renderTickets();
+      alert('Event created!');
+      renderEvents();
       updateStats();
     }
 
-    // Initialize
-    window.addEventListener('load', function() {
-      // Auto-login for demo
-      document.getElementById('loginEmail').value = 'admin@ampla.com';
-      document.getElementById('loginPassword').value = 'demo';
-      login();
-    });
-  </script>
-</body>
-</html>
+    function manageEvent(eventId) {
+      currentEventId = eventId;
+      const event = events.find(e => e.id === eventId);
+      alert('Manage: ' + event.title + '\n\nUse Registration tab to manage attendees');
+    }
+
+    // REGISTRATIONS/ATTENDEES
+    function renderRegistrations() {
+      let html = '';
+      
+      if (events.length === 0) {
+        html = '<div class="empty">No events created yet</div>';
+      } else {
+        events.forEach(event => {
+          const eventAttendees = attendees.filter(a => a.eventId === event.id);
+          const rsvpYes = eventAttendees.filter(a => a.rsvp === 'yes').length;
+          const rsvpNo = eventAttendees.filter(a => a.rsvp === 'no').length;
+          const rsvpMaybe = eventAttendees.filter(a => a.rsvp === 'maybe').length;
+          const attended = eventAttendees.filter(a => a.checkedIn).length;
+
+          html += '<div class="card">';
+          html += '<h3>' + event.title + '</h3>';
+          html += '<p>Registered: ' + eventAttendees.length + ' | ✅ ' + rsvpYes + ' | ❌ ' + rsvpNo + ' | ❓ ' + rsvpMaybe + ' | 🎫 Checked-in: ' + attended + '</p>';
+          html += '<button class="btn-primary btn-small" onclick="addAttendeeForm(' + event.id + ')">+ Add Attendee</button>';
+          html += '<button class="btn-secondary btn-small" onclick="showCheckIn(' + event.id + ')">Check-in</button>';
+          html += '<button class="btn-secondary btn-small" onclick="exportAttendeeData(' + event.id + ')">Export CSV</button>';
+          
+          if (eventAttendees.length > 0) {
+            html += '<div style="margin-top: 1rem;">';
+            eventAttendees.forEach((att, i) => {
+              const rsvpClass = 'rsvp-' + att.rsvp;
+              html += '<div style="background: #f9fafb; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 0.5rem;">';
+              html += '<p><strong>' + att.name + '</strong> <span class="rsvp-badge ' + rsvpClass + '">' + att.rsvp.toUpperCase() + '</span> ' + (att.checkedIn ? '✅ Checked-in' : '') + '</p>';
+              html += '<p style="font-size: 0.75rem; color: #666;">📧 ' + att.email + ' | 📱 ' + att.phone + '</p>';
+              html += '<button class="btn-secondary btn-small" onclick="deleteAttendee(' + event.id + ',' + i + ')">Delete</button>';
+              html += '</div>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+        });
+      }
+      
+      document.getElementById('mainContent').innerHTML = html;
+    }
+
+    function addAttendeeForm(eventId) {
+      currentEventId = eventId;
+      document.getElementById('attendeeName').value = '';
+      document.getElementById('attendeeEmail').value = '';
+      document.getElementById('attendeePhone').value = '';
+      document.getElementById('attendeeRsvp').value = 'pending';
+      document.getElementById('attendeeCategory').value = 'guest';
+      
