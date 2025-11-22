@@ -1,1 +1,14 @@
-
+{
+     "name": "zik-prize-awards",
+     "version": "1.0.0",
+     "description": "Event management system for Zik Prize Awards",
+     "scripts": {
+       "dev": "next dev",
+       "build": "next build",
+       "start": "next start"
+     },
+     "dependencies": {
+       "react": "^18.2.0",
+       "react-dom": "^18.2.0"
+     }
+   }
