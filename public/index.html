@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zik Prize Awards Event Manager</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/react.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/react-dom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+    .icon { display: inline-block; width: 20px; height: 20px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const Calendar = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+    const List = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>;
+    const Plus = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>;
+    const Edit = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>;
+    const Trash = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>;
+    const Users = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 8.048M12 4.354L7.882 8.236A4 4 0 1012.118 15.764M12 4.354l4.118 3.882a4 4 0 01-4.236 7.528M4.6 9a8 8 0 1114.8 0" /></svg>;
+    const Download = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
+    const Bell = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>;
+    const Mail = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+    const Phone = () => <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
+
+    function EventManager() {
+      const [events, setEvents] = useState([]);
+      const [view, setView] = useState('calendar');
+      const [showForm, setShowForm] = useState(false);
+      const [editingId, setEditingId] = useState(null);
+      const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+      const [registrations, setRegistrations] = useState({});
+      const [showRegistrations, setShowRegistrations] = useState(null);
+      const [regForm, setRegForm] = useState({ name: '', email: '', phone: '' });
+
+      const [formData, setFormData] = useState({
+        title: '',
+        date: '',
+        time: '',
+        location: '',
+        category: 'award-activity',
+        description: '',
+        notes: '',
+        reminder: true,
+        shareWith: '',
+      });
+
+      const categories = {
+        'award-activity': { label: 'Award Activity', color: 'bg-purple-100 border-purple-300' },
+        'vendor': { label: 'Vendor Activity', color: 'bg-blue-100 border-blue-300' },
+        'meeting': { label: 'Work Meeting', color: 'bg-green-100 border-green-300' },
+        'planning': { label: 'Planning Session', color: 'bg-orange-100 border-orange-300' },
+      };
+
+      useEffect(() => {
+        const saved = localStorage.getItem('zikEvents');
+        if (saved) {
+          setEvents(JSON.parse(saved));
+          const regs = localStorage.getItem('zikRegistrations');
+          if (regs) setRegistrations(JSON.parse(regs));
+        }
+      }, []);
+
+      const saveData = (newEvents, newRegs = registrations) => {
+        localStorage.setItem('zikEvents', JSON.stringify(newEvents));
+        localStorage.setItem('zikRegistrations', JSON.stringify(newRegs));
+      };
+
+      const handleAddEvent = () => {
+        if (!formData.title || !formData.date) {
+          alert('Please fill in title and date');
+          return;
+        }
+
+        if (editingId) {
+          const updated = events.map(e => e.id === editingId ? { ...formData, id: editingId } : e);
+          setEvents(updated);
+          saveData(updated);
+          setEditingId(null);
+        } else {
+          const newEvent = { ...formData, id: Date.now() };
+          const updated = [...events, newEvent];
+          setEvents(updated);
+          saveData(updated);
+        }
+
+        setFormData({
+          title: '',
+          date: '',
+          time: '',
+          location: '',
+          category: 'award-activity',
+          description: '',
+          notes: '',
+          reminder: true,
+          shareWith: '',
+        });
+        setShowForm(false);
+      };
+
+      const handleEdit = (event) => {
+        setFormData(event);
+        setEditingId(event.id);
+        setShowForm(true);
+      };
+
+      const handleDelete = (id) => {
+        if (confirm('Delete this event?')) {
+          const updated = events.filter(e => e.id !== id);
+          setEvents(updated);
+          saveData(updated);
+        }
+      };
+
+      const handleRegister = () => {
+        if (!regForm.name || !regForm.email || !regForm.phone) {
+          alert('Please fill all fields');
+          return;
+        }
+        const key = `reg-${showRegistrations}`;
+        const existing = registrations[key] || [];
+        const updated = { ...registrations, [key]: [...existing, { ...regForm, time: new Date().toLocaleString() }] };
+        setRegistrations(updated);
+        saveData(events, updated);
+        setRegForm({ name: '', email: '', phone: '' });
+      };
+
+      const exportCSV = (eventId) => {
+        const key = `reg-${eventId}`;
+        const regs = registrations[key] || [];
+        if (regs.length === 0) {
+          alert('No registrations to export');
+          return;
+        }
+        const csv = ['Name,Email,Phone,Registration Time', ...regs.map(r => `${r.name},${r.email},${r.phone},${r.time}`)].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `registrations-${eventId}.csv`;
+        a.click();
+      };
+
+      const sortedEvents = [...events].sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+
+      const calendarDays = [];
+      const now = new Date(selectedDate);
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+      for (let i = 0; i < 42; i++) {
+        calendarDays.push(new Date(startDate));
+        startDate.setDate(startDate.getDate() + 1);
+      }
+
+      const getEventsForDate = (date) => events.filter(e => e.date === date.toISOString().split('T')[0]);
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-purple-900 mb-2">Zik Prize Awards Manager</h1>
+              <p className="text-gray-600">Manage events, activities, and registrations for the Zik Prize Awards</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+              <div className="lg:col-span-3">
+                <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                  <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
+                    <div className="flex gap-2">
+                      <button onClick={() => setView('calendar')} className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${view === 'calendar' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                        <Calendar /> Calendar
+                      </button>
+                      <button onClick={() => setView('list')} className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${view === 'list' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                        <List /> List
+                      </button>
+                    </div>
+                    <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium flex items-center gap-2 hover:bg-purple-700">
+                      <Plus /> New Event
+                    </button>
+                  </div>
+
+                  {view === 'calendar' && (
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold text-gray-800">{new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
+                        <div className="flex gap-2">
+                          <button onClick={() => setSelectedDate(new Date(new Date(selectedDate).setMonth(new Date(selectedDate).getMonth() - 1)).toISOString().split('T')[0])} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">←</button>
+                          <button onClick={() => setSelectedDate(new Date(new Date(selectedDate).setMonth(new Date(selectedDate).getMonth() + 1)).toISOString().split('T')[0])} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">→</button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-7 gap-2">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => <div key={d} className="text-center font-semibold text-gray-600 py-2">{d}</div>)}
+                        {calendarDays.map((date, i) => {
+                          const dayEvents = getEventsForDate(date);
+                          const isCurrentMonth = date.getMonth() === new Date(selectedDate).getMonth();
+                          return (
+                            <div key={i} className={`p-2 rounded-lg border-2 min-h-24 ${isCurrentMonth ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100'}`}>
+                              <div className="font-semibold text-sm text-gray-600 mb-1">{date.getDate()}</div>
+                              {dayEvents.slice(0, 2).map(e => (
+                                <div key={e.id} className={`text-xs p-1 rounded mb-1 truncate cursor-pointer ${categories[e.category].color}`}>
+                                  {e.title}
+                                </div>
+                              ))}
+                              {dayEvents.length > 2 && <div className="text-xs text-gray-500">+{dayEvents.length - 2} more</div>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {view === 'list' && (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {sortedEvents.length === 0 ? (
+                        <p className="text-gray-500 text-center py-8">No events scheduled yet</p>
+                      ) : (
+                        sortedEvents.map(event => (
+                          <div key={event.id} className={`p-4 rounded-lg border-l-4 ${categories[event.category].color} flex justify-between items-start`}>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900">{event.title}</h3>
+                              <p className="text-sm text-gray-600">{event.date} at {event.time || 'TBA'}</p>
+                              {event.location && <p className="text-sm text-gray-600">📍 {event.location}</p>}
+                              {event.reminder && <p className="text-xs text-blue-600 flex items-center gap-1 mt-1"><Bell /> Reminder set</p>}
+                            </div>
+                            <div className="flex gap-2">
+                              <button onClick={() => setShowRegistrations(event.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded" title="View registrations">
+                                <Users />
+                              </button>
+                              <button onClick={() => handleEdit(event)} className="p-2 text-gray-600 hover:bg-gray-100 rounded">
+                                <Edit />
+                              </button>
+                              <button onClick={() => handleDelete(event.id)} className="p-2 text-red-600 hover:bg-red-50 rounded">
+                                <Trash />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-lg p-6 sticky top-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">Quick Stats</h3>
+                  <div className="space-y-4">
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <p className="text-sm text-gray-600">Total Events</p>
+                      <p className="text-2xl font-bold text-purple-600">{events.length}</p>
+                    </div>
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-gray-600">Total Registrations</p>
+                      <p className="text-2xl font-bold text-blue-600">{Object.values(registrations).reduce((sum, arr) => sum + arr.length, 0)}</p>
+                    </div>
+                    <div className="p-3 bg-green-50 rounded-lg">
+                      <p className="text-sm text-gray-600">Upcoming Events</p>
+                      <p className="text-2xl font-bold text-green-600">{events.filter(e => e.date >= new Date().toISOString().split('T')[0]).length}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {showForm && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto">
+                  <div className="p-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{editingId ? 'Edit Event' : 'Create New Event'}</h2>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Event Title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" />
+                        <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500">
+                          {Object.entries(categories).map(([key, val]) => <option key={key} value={key}>{val.label}</option>)}
+                        </select>
+                        <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" />
+                        <input type="time" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" />
+                        <input type="text" placeholder="Location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" />
+                        <input type="email" placeholder="Share with (email)" value={formData.shareWith} onChange={(e) => setFormData({...formData, shareWith: e.target.value})} className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" />
+                      </div>
+                      <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 h-20" />
+                      <textarea placeholder="Notes & Documents" value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 h-20" />
+                      <label className="flex items-center gap-2">
+                        <input type="checkbox" checked={formData.reminder} onChange={(e) => setFormData({...formData, reminder: e.target.checked})} className="w-4 h-4" />
+                        <span className="text-gray-700">Send reminder notification</span>
+                      </label>
+                    </div>
+                    <div className="flex gap-4 mt-6 justify-end">
+                      <button onClick={() => {setShowForm(false); setEditingId(null);}} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                      <button onClick={handleAddEvent} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">{editingId ? 'Update Event' : 'Create Event'}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showRegistrations !== null && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-2xl font-bold text-gray-900">Registrations & Attendance</h2>
+                      <button onClick={() => setShowRegistrations(null)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                      <h3 className="font-semibold text-gray-900 mb-3">Add Registration</h3>
+                      <div className="space-y-2">
+                        <input type="text" placeholder="Full Name" value={regForm.name} onChange={(e) => setRegForm({...regForm, name: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                        <input type="email" placeholder="Email" value={regForm.email} onChange={(e) => setRegForm({...regForm, email: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                        <input type="tel" placeholder="Phone" value={regForm.phone} onChange={(e) => setRegForm({...regForm, phone: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                        <button onClick={handleRegister} className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">Register Attendee</button>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="font-semibold text-gray-900">Registered Attendees ({(registrations[`reg-${showRegistrations}`] || []).length})</h3>
+                        <button onClick={() => exportCSV(showRegistrations)} className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                          <Download /> Export
+                        </button>
+                      </div>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {(registrations[`reg-${showRegistrations}`] || []).map((reg, i) => (
+                          <div key={i} className="p-3 bg-gray-50 rounded-lg">
+                            <p className="font-medium text-gray-900">{reg.name}</p>
+                            <p className="text-sm text-gray-600 flex items-center gap-1"><Mail /> {reg.email}</p>
+                            <p className="text-sm text-gray-600 flex items-center gap-1"><Phone /> {reg.phone}</p>
+                            <p className="text-xs text-gray-500 mt-1">Registered: {reg.time}</p>
+                          </div>
+                        ))}
+                        {(registrations[`reg-${showRegistrations}`] || []).length === 0 && <p className="text-gray-500 text-center py-4">No registrations yet</p>}
+                      </div>
+                    </div>
+                    <button onClick={() => setShowRegistrations(null)} className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Close</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<EventManager />, document.getElementById('root'));
+  </script>
+</body>
+</html>
