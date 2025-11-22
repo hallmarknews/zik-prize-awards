@@ -4,15 +4,3 @@
      ]
    }
 ```
-   - Save as `vercel.json` in the root folder
-
-4. **Create `public/index.html`**:
-   - Use the HTML code from the markdown artifact above
-   - Save in the `public` folder as `index.html`
-
-5. **Create `.gitignore`**:
-```
-   node_modules/
-   .env.local
-   .DS_Store
-   *.log
